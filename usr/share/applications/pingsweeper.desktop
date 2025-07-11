@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Ping Sweeper
+Comment=Scanner IP graphique
+Exec=pingsweeper
+Icon=pingsweeper
+Terminal=false
+Type=Application
+Categories=Network;Utility;

@@ -1,0 +1,8 @@
+Package: pingsweeper
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3, python3-tk
+Maintainer: Ghassenz <you@example.com>
+Description: Outil graphique pour scanner les IP actives d’un réseau local

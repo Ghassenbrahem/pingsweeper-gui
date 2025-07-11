@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+import subprocess
+import platform
+import threading
+import socket
+import tkinter as tk
+from tkinter import scrolledtext
+
+def scan_network():
+    base_ip = entry.get().strip()
+    if len(base_ip.split(".")) != 3:
+        status_label.config(text="❌ Entrée invalide. Format attendu : 192.168.1")
+        return
+
+    result_box.delete(1.0, tk.END)
+    status_label.config(text="🔎 Scan en cours...")
+
+    def ping(ip):
+        param = "-n" if platform.system().lower() == "windows" else "-c"
+        try:
+            subprocess.check_output(["ping", param, "1", ip], stderr=subprocess.DEVNULL)
+            try:
+                hostname = socket.gethostbyaddr(ip)[0]
+            except:
+                hostname = "inconnu"
+            result_box.insert(tk.END, f"[+] {ip} → {hostname} est actif\n")
+        except subprocess.CalledProcessError:
+            pass
+
+    threads = []
+    for i in range(1, 255):
+        ip = f"{base_ip}.{i}"
+        t = threading.Thread(target=ping, args=(ip,))
+        t.start()
+        threads.append(t)
+
+    def check_done():
+        if any(t.is_alive() for t in threads):
+            root.after(100, check_done)
+        else:
+            status_label.config(text="✅ Scan terminé.")
+
+    check_done()
+
+def detect_my_ip_base():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+        base_ip = ".".join(local_ip.split(".")[:3])
+        entry.delete(0, tk.END)
+        entry.insert(0, base_ip)
+        status_label.config(text=f"📡 IP détectée : {base_ip}")
+    except:
+        status_label.config(text="❌ Impossible de détecter l'IP")
+
+# Interface graphique
+root = tk.Tk()
+root.title("Ping Sweeper GUI")
+root.geometry("640x480")
+
+tk.Label(root, text="Base IP (ex: 192.168.1)").pack(pady=5)
+entry = tk.Entry(root, width=20)
+entry.pack()
+entry.insert(0, "192.168.1")
+
+tk.Button(root, text="🔍 Détecter IP", command=detect_my_ip_base, bg="#4CAF50", fg="white").pack(pady=5)
+tk.Button(root, text="🚀 Lancer le scan", command=scan_network, bg="#1E88E5", fg="white").pack(pady=10)
+
+result_box = scrolledtext.ScrolledText(root, width=80, height=20, bg="#1e1e1e", fg="#00FF00")
+result_box.pack(padx=10, pady=10)
+
+status_label = tk.Label(root, text="⏳ En attente...")
+status_label.pack()
+
+root.mainloop()
