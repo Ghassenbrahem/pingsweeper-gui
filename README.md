@@ -24,7 +24,7 @@
 ## 📦 Installation
 
 ```bash
-wget https://github.com/Ghassenz/pingsweeper-gui/releases/download/v1.0/scanner-gui.deb
+wget https://github.com/Ghassenbrahem/pingsweeper-gui/releases/download/v1.0/scanner-gui.deb
 sudo dpkg -i scanner-gui.deb
 ```
 
